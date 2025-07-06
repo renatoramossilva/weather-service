@@ -1,0 +1,11 @@
+[project]
+name = "weather-service"
+version = "0.1.0"
+description = "A FastAPI-based microservice that retrieves the current temperature for a given city using real-time weather data."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.14",
+    "httpx>=0.28.1",
+    "uvicorn>=0.35.0",
+]
