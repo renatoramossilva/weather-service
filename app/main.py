@@ -2,7 +2,11 @@
 from fastapi import FastAPI
 from app.api.v1.routes import router as api_router
 
-app = FastAPI(title="Weather Service API")
+app = FastAPI(
+    title="🌤️ Weather API",
+    description="Get real-time weather data by city.",
+    version="1.0.0",
+)
 
 @app.get("/")
 def root():
