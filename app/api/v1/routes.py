@@ -1,4 +1,5 @@
-" FastAPI application for a weather service API "
+"FastAPI application for a weather service API"
+
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Annotated
 import httpx
@@ -10,6 +11,7 @@ from app.services.weather_services import get_temperature, get_http_client
 router = APIRouter()
 
 HttpClientDependency = Annotated[httpx.AsyncClient, Depends(get_http_client)]
+
 
 @router.get(
     "/weather/{city}",
@@ -37,5 +39,5 @@ async def weather(
     except Exception as e:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND,
-            detail=f"City not found or API error: {str(e)}"
+            detail=f"City not found or API error: {str(e)}",
         ) from e

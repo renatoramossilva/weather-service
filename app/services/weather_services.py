@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from fastapi.security.api_key import APIKeyHeader
+from typing import AsyncGenerator
 
 
 load_dotenv()
@@ -17,7 +18,7 @@ api_key_header = APIKeyHeader(name="x-api-key", auto_error=True)
 
 
 # Dependency: reusable async HTTP client
-async def get_http_client() -> httpx.AsyncClient:
+async def get_http_client() -> AsyncGenerator[httpx.AsyncClient]:
     """
     Create and yield an async HTTP client for making requests.
 
@@ -53,11 +54,7 @@ async def get_temperature(client: httpx.AsyncClient, city: str):
         "local_time": "2025-07-06T13:28"
     }
     """
-    params = {
-        "key": API_KEY,
-        "q": city,
-        "aqi": "no"
-    }
+    params = {"key": API_KEY, "q": city, "aqi": "no"}
     try:
         response = await client.get(BASE_URL, params=params)
         response.raise_for_status()
@@ -71,7 +68,9 @@ async def get_temperature(client: httpx.AsyncClient, city: str):
             "local_time": data["location"]["localtime"].replace(" ", "T"),
         }
     except httpx.HTTPStatusError as exc:
-        raise HTTPException(status_code=exc.response.status_code, detail="Weather API error") from exc
+        raise HTTPException(
+            status_code=exc.response.status_code, detail="Weather API error"
+        ) from exc
 
     except httpx.RequestError as exc:
         raise HTTPException(status_code=503, detail=f"Network error: {exc}") from exc
