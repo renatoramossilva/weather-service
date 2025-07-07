@@ -40,4 +40,4 @@ jobs:
         run: uv run ruff check --fix --exit-non-zero-on-fix
 
       - name: Run mypy
-        run: uv run mypy **/*.py --install-types --non-interactive --verbose
+        run: uv run mypy **/*.py --install-types --non-interactive
