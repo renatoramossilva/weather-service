@@ -3,10 +3,12 @@
 
 import httpx
 import os
+import json
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from fastapi.security.api_key import APIKeyHeader
 from typing import AsyncGenerator
+from app.services.redis import get_redis_repo
 
 
 load_dotenv()
@@ -54,19 +56,28 @@ async def get_temperature(client: httpx.AsyncClient, city: str):
         "local_time": "2025-07-06T13:28"
     }
     """
+    redis_client = get_redis_repo()
+    cached_city = redis_client.get_value(city)
+    if cached_city:
+        print("Getting city info (%s) from cache", city)
+        return json.loads(cached_city)
+
     params = {"key": API_KEY, "q": city, "aqi": "no"}
     try:
         response = await client.get(BASE_URL, params=params)
         response.raise_for_status()
         data = response.json()
 
-        return {
+        result = {
             "city": data["location"]["name"],
             "country": data["location"]["country"],
             "temperature_celsius": data["current"]["temp_c"],
             "condition": data["current"]["condition"]["text"],
             "local_time": data["location"]["localtime"].replace(" ", "T"),
         }
+
+        redis_client.set_value(city, json.dumps(result), 1800)  # 30s
+        return result
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=exc.response.status_code, detail="Weather API error"
