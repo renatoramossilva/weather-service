@@ -88,3 +88,18 @@ This project includes a **GitHub Actions pipeline** that runs automatic code qua
 🔒 **Merges to `master` are only allowed if all checks pass.**
 
 This ensures high code quality and consistency across the project.
+
+
+## 🐳 Docker Compose Support
+
+You can use docker-compose to run the app in a containerized development environment:
+
+```
+docker-compose up --build
+```
+
+This will:
+
+- Build the image using the provided Dockerfile
+
+- Start the FastAPI application at http://localhost:8000
