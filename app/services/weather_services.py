@@ -18,7 +18,7 @@ api_key_header = APIKeyHeader(name="x-api-key", auto_error=True)
 
 
 # Dependency: reusable async HTTP client
-async def get_http_client() -> AsyncGenerator[httpx.AsyncClient]:
+async def get_http_client() -> AsyncGenerator[httpx.AsyncClient, httpx.AsyncClient]:
     """
     Create and yield an async HTTP client for making requests.
 

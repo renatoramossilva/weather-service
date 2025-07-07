@@ -1,0 +1,8 @@
+
+services:
+
+  weather-app:
+    build:
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
