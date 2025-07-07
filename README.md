@@ -103,3 +103,35 @@ This will:
 - Build the image using the provided Dockerfile
 
 - Start the FastAPI application at http://localhost:8000
+
+
+## ⚡ Redis Cache Support
+
+
+This project supports response caching via Redis to improve performance and reduce external API calls.
+
+### 🧠 How It Works
+
+
+When a request is made to the weather endpoint:
+
+The API first checks if the data for the given city is already cached in Redis.
+
+If cached, it returns the stored result.
+
+If not, it fetches fresh data from the WeatherAPI, stores it in Redis (30 min), and returns the result.
+
+This approach significantly reduces latency and external API usage.
+
+
+
+### 🌐 Access RedisInsight
+
+
+For easy monitoring and management of the Redis instance, it is possible to use RedisInsight — a powerful GUI tool.
+
+Open your browser and go to:
+
+http://localhost:8001/
+
+Here, you can visualize your Redis keys, monitor performance, and manage the cache in a friendly interface.
