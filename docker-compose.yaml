@@ -1,8 +1,19 @@
 
 services:
 
-  weather-app:
+  app:
+    container_name: weather-service-app
     build:
       dockerfile: docker/Dockerfile
     ports:
       - "8000:8000"
+    depends_on:
+      - redis
+
+  redis:
+    container_name: redis-weather-service
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"   # RedisInsight (WEB)
+    restart: unless-stopped

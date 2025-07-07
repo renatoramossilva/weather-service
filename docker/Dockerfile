@@ -1,6 +1,10 @@
 # Docker image with uv pre-installed
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
+# Install Git (required for git+ dependencies)
+RUN apt-get update && apt-get install -y git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Set workdir
 WORKDIR /app
 
