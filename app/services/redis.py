@@ -2,6 +2,10 @@
 
 import bindl.redis_wrapper.connection.redis_connection as rc
 import bindl.redis_wrapper.redis_handler as rh
+import bindl.logger
+
+
+LOG = bindl.logger.setup_logger(__name__)
 
 
 class RedisConnectionError(Exception):
@@ -26,4 +30,4 @@ def get_redis_repo() -> rc.RedisConnectionHandler:
     if redis_conn.ping():
         return rh.RedisHandler(redis_conn)
     else:
-        print("Unable to connect to Redis.")
+        LOG.error("Unable to connect to Redis.")
