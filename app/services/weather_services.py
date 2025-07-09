@@ -6,17 +6,23 @@ import os
 import json
 from dotenv import load_dotenv
 from fastapi import HTTPException
-from fastapi.security.api_key import APIKeyHeader
 from typing import AsyncGenerator
 from app.services.redis import get_redis_repo
+import bindl.logger
 
 
+LOG = bindl.logger.setup_logger(__name__)
+EXPIRE_TIME = 1800  # 30 minutes
+
+# Load .env file
 load_dotenv()
 
 API_KEY = os.getenv("WEATHER_API_KEY")
 BASE_URL = "https://api.weatherapi.com/v1/current.json"
 
-api_key_header = APIKeyHeader(name="x-api-key", auto_error=True)
+
+class GetWeatherInfoError(Exception):
+    pass
 
 
 # Dependency: reusable async HTTP client
@@ -56,28 +62,40 @@ async def get_temperature(client: httpx.AsyncClient, city: str):
         "local_time": "2025-07-06T13:28"
     }
     """
+    LOG.info("Getting weather info for the search: %r", city)
+    cache_key = f"weather_info:v1:{city}"
     redis_client = get_redis_repo()
-    cached_city = redis_client.get_value(city)
+    cached_city = redis_client.get_value(cache_key)
     if cached_city:
-        print("Getting city info (%s) from cache", city)
+        LOG.info("Getting city info (%r) from Redis cache", cache_key)
         return json.loads(cached_city)
 
     params = {"key": API_KEY, "q": city, "aqi": "no"}
     try:
+        LOG.info("Get weather info from %r", BASE_URL)
         response = await client.get(BASE_URL, params=params)
         response.raise_for_status()
+        LOG.info("Response received with no erros.")
+
         data = response.json()
+        if data:
+            result = {
+                "city": data["location"]["name"],
+                "country": data["location"]["country"],
+                "temperature_celsius": data["current"]["temp_c"],
+                "condition": data["current"]["condition"]["text"],
+                "local_time": data["location"]["localtime"].replace(" ", "T"),
+            }
 
-        result = {
-            "city": data["location"]["name"],
-            "country": data["location"]["country"],
-            "temperature_celsius": data["current"]["temp_c"],
-            "condition": data["current"]["condition"]["text"],
-            "local_time": data["location"]["localtime"].replace(" ", "T"),
-        }
-
-        redis_client.set_value(city, json.dumps(result), 1800)  # 30s
-        return result
+            LOG.info("Saving info %s on Redis cache", result)
+            redis_client.set_value(cache_key, json.dumps(result), EXPIRE_TIME)
+            LOG.info(
+                "Weather info saved on cache. This info will expire in %d minutes",
+                EXPIRE_TIME / 60,
+            )
+            return result
+        else:
+            raise GetWeatherInfoError("Error getting info weather from ", BASE_URL)
     except httpx.HTTPStatusError as exc:
         raise HTTPException(
             status_code=exc.response.status_code, detail="Weather API error"
