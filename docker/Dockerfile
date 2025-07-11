@@ -17,7 +17,7 @@ RUN uv sync --locked
 # Expose port 8000
 # This config should matches with the ports config on
 # docker compose file
-EXPOSE 8000
+EXPOSE 8000 8082
 
 # Run app
 CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

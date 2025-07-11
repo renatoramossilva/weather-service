@@ -17,4 +17,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-bindl-lib = { git = "https://github.com/renatoramossilva/bindl-lib", rev = "1.1.2" }
+bindl-lib = { git = "https://github.com/renatoramossilva/bindl-lib", branch = "add-prometheus-wrapper" }
