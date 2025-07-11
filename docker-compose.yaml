@@ -9,6 +9,9 @@ services:
       - "8000:8000"
     depends_on:
       - redis
+      - metrics-exporter
+    networks:
+      - weather-network
 
   redis:
     container_name: redis-weather-service
@@ -17,3 +20,42 @@ services:
       - "6379:6379"
       - "8001:8001"   # RedisInsight (WEB)
     restart: unless-stopped
+    networks:
+      - weather-network
+
+  metrics-exporter:
+    container_name: metrics-exporter
+    build:
+      dockerfile: exporter/Dockerfile
+    ports:
+      - "8082:8082"
+    networks:
+      - weather-network
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - weather-network
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3030:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - weather-network
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  weather-network:
+    driver: bridge
