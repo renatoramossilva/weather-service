@@ -3,16 +3,14 @@
 
 import httpx
 import os
-import json
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from typing import AsyncGenerator
-from app.services.redis import get_redis_repo
+from app.services.redis import get_info_from_redis, save_info_redis
 import bindl.logger
 
 
 LOG = bindl.logger.setup_logger(__name__)
-EXPIRE_TIME = 1800  # 30 minutes
 
 # Load .env file
 load_dotenv()
@@ -64,11 +62,10 @@ async def get_temperature(client: httpx.AsyncClient, city: str):
     """
     LOG.info("Getting weather info for the search: %r", city)
     cache_key = f"weather_info:v1:{city}"
-    redis_client = get_redis_repo()
-    cached_city = redis_client.get_value(cache_key)
+    cached_city = await get_info_from_redis(cache_key=cache_key)
     if cached_city:
-        LOG.info("Getting city info (%r) from Redis cache", cache_key)
-        return json.loads(cached_city)
+        LOG.info("Returning city info (%r) found in Redis cache", cache_key)
+        return cached_city
 
     params = {"key": API_KEY, "q": city, "aqi": "no"}
     try:
@@ -86,14 +83,9 @@ async def get_temperature(client: httpx.AsyncClient, city: str):
                 "condition": data["current"]["condition"]["text"],
                 "local_time": data["location"]["localtime"].replace(" ", "T"),
             }
-
-            LOG.info("Saving info %s on Redis cache", result)
-            redis_client.set_value(cache_key, json.dumps(result), EXPIRE_TIME)
-            LOG.info(
-                "Weather info saved on cache. This info will expire in %d minutes",
-                EXPIRE_TIME / 60,
-            )
+            await save_info_redis(cache_key=cache_key, result=result)
             return result
+
         else:
             raise GetWeatherInfoError("Error getting info weather from ", BASE_URL)
     except httpx.HTTPStatusError as exc:
