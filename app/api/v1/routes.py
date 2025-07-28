@@ -6,7 +6,7 @@ import httpx
 from starlette.status import HTTP_200_OK, HTTP_404_NOT_FOUND
 from app.api.v1.schemas import WeatherResponse
 from app.services.weather_services import get_temperature, get_http_client
-
+from exporter.metrics_exporter import post_metrics
 
 router = APIRouter()
 
@@ -41,3 +41,13 @@ async def weather(
             status_code=HTTP_404_NOT_FOUND,
             detail=f"City not found or API error: {str(e)}",
         ) from e
+    finally:
+        metric_payload = {
+            "name": "requests_total",
+            "description": "Total number of requests",
+            "labels": ["method", "endpoint"],
+            "method": "GET",
+            "endpoint": "/app/api/v1/routes/weather",
+            "type": "counter",
+        }
+        post_metrics(metrics_data=metric_payload)
