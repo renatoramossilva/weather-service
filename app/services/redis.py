@@ -1,14 +1,20 @@
 """Set up a Redis connection and initialize a handler for interacting with it"""
 
+from typing import Optional
 import bindl.redis_wrapper.connection.redis_connection as rc
 import bindl.redis_wrapper.redis_handler as rh
 import bindl.logger
+import bindl.rabbitmq_wrapper.publisher as pub
 
 import json
 
 
 LOG = bindl.logger.setup_logger(__name__)
 EXPIRE_TIME = 1800  # 30 minutes
+# This should match the exchange name used in the RabbitMQ setup
+RABBITMQ_EXCHANGE = "weather_service_exchange"
+# This should match the host name used in the docker-compose file
+RABBITMQ_HOST = "rabbitmq"
 
 
 class RedisConnectionError(Exception):
@@ -36,7 +42,14 @@ def get_redis_repo() -> rc.RedisConnectionHandler:
         LOG.error("Unable to connect to Redis.")
 
 
-async def get_info_from_redis(cache_key):
+async def get_info_from_redis(cache_key: str) -> Optional[dict]:
+    """Retrieve information from Redis cache.
+
+    **Parameters**
+        cache_key: The key under which the information is stored in Redis.
+    **Returns**
+        dict: The cached information if found, otherwise None.
+    """
     LOG.info(f"Check if {cache_key} exists")
     try:
         LOG.info("Connecting")
@@ -54,15 +67,21 @@ async def get_info_from_redis(cache_key):
     return None
 
 
-async def save_info_redis(cache_key, result):
-    try:
-        redis_client = get_redis_repo()
-        redis_client.set_value(cache_key, json.dumps(result), EXPIRE_TIME)
-    except Exception as ex:
-        LOG.erro(f"Error saving on Redis: {ex}")
+async def save_info_redis(cache_key: str, result: dict) -> None:
+    """Publish a message to RabbitMQ to be processed by a worker to save the result in Redis.
 
-    LOG.info("Saving info %s on Redis cache", result)
-    LOG.info(
-        "Weather info saved on cache. This info will expire in %d minutes",
-        EXPIRE_TIME / 60,
+    **Parameters**
+        cache_key: The key under which the result will be stored in Redis.
+        result: The result data to be saved in Redis.
+    """
+    LOG.info("Starting RabbitMQ publisher")
+    # Initialize the RabbitMQ publisher
+    rabbitmq_publisher = pub.RabbitmqPublisher(
+        host=RABBITMQ_HOST, exchange=RABBITMQ_EXCHANGE
+    )
+
+    LOG.info("Publishing message to RabbitMQ exchange %s", RABBITMQ_EXCHANGE)
+    # Post a message
+    rabbitmq_publisher.send_message(
+        dict(cache_key=cache_key, payload=result, expire=EXPIRE_TIME)
     )
