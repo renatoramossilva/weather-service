@@ -18,4 +18,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-bindl-lib = { git = "https://github.com/renatoramossilva/bindl-lib", rev = "1.2.0" }
+bindl-lib = { git = "https://github.com/renatoramossilva/bindl-lib", branch = "add-rabbitmq-support" }
