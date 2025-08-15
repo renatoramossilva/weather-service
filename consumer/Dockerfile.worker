@@ -1,0 +1,21 @@
+# Dockerfile for Celery Consumer
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
+# Install Git (required for git+ dependencies)
+RUN apt-get update && apt-get install -y git && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Define vars for RabbitMQ
+WORKDIR /app
+
+# Copy project to workdir
+COPY . ./
+
+# Install project dependencies
+RUN uv sync --locked
+
+# Environment variable for Celery
+ENV CELERY_APP=consumer.celery_consumer:app
+
+# Default command (Celery worker)
+CMD ["uv", "run", "celery", "-A", "consumer.celery_consumer:app", "worker", "--loglevel=DEBUG"]

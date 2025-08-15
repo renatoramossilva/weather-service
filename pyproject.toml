@@ -7,9 +7,12 @@ requires-python = ">=3.12"
 dependencies = [
     "bindl-lib",
     "black>=25.1.0",
+    "celery>=5.5.3",
     "dotenv>=0.9.9",
     "fastapi>=0.115.14",
+    "flower>=2.0.1",
     "httpx>=0.28.1",
+    "kombu>=5.5.4",
     "mypy>=1.16.1",
     "pydantic>=2.11.7",
     "requests>=2.32.4",
@@ -18,7 +21,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-bindl-lib = { git = "https://github.com/renatoramossilva/bindl-lib", rev = "1.2.1" }
+bindl-lib = { git = "https://github.com/renatoramossilva/bindl-lib", rev = "1.3.0" }
 
 [dependency-groups]
 dev = [

@@ -84,7 +84,10 @@ async def get_temperature(client: httpx.AsyncClient, city: str):
                 "condition": data["current"]["condition"]["text"],
                 "local_time": data["location"]["localtime"].replace(" ", "T"),
             }
-            await save_info_redis(cache_key=cache_key, result=result)
+
+            LOG.info("Saving city info (%r) to Redis cache", cache_key)
+            save_info_redis(cache_key=cache_key, result=result)
+
             return result
 
         else:

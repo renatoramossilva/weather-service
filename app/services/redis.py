@@ -3,12 +3,19 @@
 import bindl.redis_wrapper.connection.redis_connection as rc
 import bindl.redis_wrapper.redis_handler as rh
 import bindl.logger
-
+from consumer.celery_consumer import process_message
 import json
 
 
 LOG = bindl.logger.setup_logger(__name__)
 EXPIRATION_TIME = 1800  # 30 minutes
+
+# This should match the exchange name used in the RabbitMQ setup
+RABBITMQ_EXCHANGE = "weather_service_exchange"
+# This should match the host name used in the docker-compose file
+RABBITMQ_HOST = "rabbitmq"
+RABBITMQ_ROUTING_KEY = "mongodb_queue"
+RABBITMQ_QUEUE = "weather_service_queue"
 
 
 class RedisConnectionError(Exception):
@@ -66,26 +73,16 @@ async def get_info_from_redis(cache_key: str) -> dict | None:
     return None
 
 
-async def save_info_redis(cache_key: str, result: dict) -> None:
-    """Save city information to Redis cache.
-
-    This function saves the provided city information to Redis cache using the specified cache key.
-    It serializes the city information to JSON format and sets it in Redis
+def save_info_redis(cache_key: str, result: dict) -> None:
+    """Publish a message to RabbitMQ to be processed by a worker to save the result in Redis.
 
     **Parameters**
         cache_key: The key under which the city information will be stored in Redis.
         result: The city information to be cached, provided as a dictionary.
     """
-    LOG.info("Saving info %s on Redis cache", result)
-
+    message = dict(cache_key=cache_key, payload=result, expire=EXPIRATION_TIME)
+    LOG.debug("Publishing message to RabbitMQ... %s", message)
     try:
-        redis_client = get_redis_repo()
-        redis_client.set_value(cache_key, json.dumps(result), EXPIRATION_TIME)
-    except Exception as ex:
-        LOG.error(f"Error saving on Redis: {ex}")
-        return
-
-    LOG.info(
-        "Weather info saved on cache. This info will expire in %d minutes",
-        EXPIRATION_TIME / 60,
-    )
+        process_message.delay(message)
+    except Exception as e:
+        LOG.error("Error publishing message to RabbitMQ: %s", e)
