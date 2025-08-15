@@ -19,3 +19,8 @@ dependencies = [
 
 [tool.uv.sources]
 bindl-lib = { git = "https://github.com/renatoramossilva/bindl-lib", rev = "1.2.0" }
+
+[dependency-groups]
+dev = [
+    "types-requests>=2.32.4.20250809",
+]
