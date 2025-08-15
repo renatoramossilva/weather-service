@@ -1,6 +1,7 @@
 # app/services/weather_services.py
 """Service to fetch weather information from WeatherAPI."""
 
+import json
 import httpx
 import os
 from dotenv import load_dotenv
@@ -69,12 +70,12 @@ async def get_temperature(client: httpx.AsyncClient, city: str):
 
     params = {"key": API_KEY, "q": city, "aqi": "no"}
     try:
-        LOG.info("Get weather info from %r", BASE_URL)
+        LOG.info("Getting weather info from %r", BASE_URL)
         response = await client.get(BASE_URL, params=params)
         response.raise_for_status()
-        LOG.info("Response received with no erros.")
-
         data = response.json()
+        LOG.info("Response received with no errors:\n%s", json.dumps(data, indent=2))
+
         if data:
             result = {
                 "city": data["location"]["name"],
