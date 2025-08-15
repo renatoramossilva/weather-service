@@ -36,8 +36,8 @@ wheels = [
 
 [[package]]
 name = "bindl-lib"
-version = "1.2.0"
-source = { git = "https://github.com/renatoramossilva/bindl-lib?rev=1.2.0#5df7c04e5cab8730001d38d691a64e270da07eab" }
+version = "1.2.1"
+source = { git = "https://github.com/renatoramossilva/bindl-lib?rev=1.2.1#ea1f6c928987a8d58718c2ac7695f4fff256ca57" }
 dependencies = [
     { name = "black" },
     { name = "mypy" },
@@ -559,7 +559,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bindl-lib", git = "https://github.com/renatoramossilva/bindl-lib?rev=1.2.0" },
+    { name = "bindl-lib", git = "https://github.com/renatoramossilva/bindl-lib?rev=1.2.1" },
     { name = "black", specifier = ">=25.1.0" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "fastapi", specifier = ">=0.115.14" },
