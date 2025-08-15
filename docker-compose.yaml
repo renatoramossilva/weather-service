@@ -5,11 +5,14 @@ services:
     container_name: weather-service-app
     build:
       dockerfile: docker/Dockerfile
+    environment:
+      RABBITMQ_URL: amqp://admin:${RABBITMQ_PASS}@rabbitmq:5672//
     ports:
       - "8000:8000"
     depends_on:
       - redis
       - metrics-exporter
+      - rabbitmq
     networks:
       - weather-network
 
@@ -52,9 +55,47 @@ services:
     networks:
       - weather-network
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+        - "5672:5672"  # broker
+        - "15672:15672"  # management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+        RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+        RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    networks:
+      - weather-network
+
+  celery-consumer:
+    build:
+      dockerfile: consumer/Dockerfile.worker
+    environment:
+      RABBITMQ_URL: amqp://admin:${RABBITMQ_PASS}@rabbitmq:5672//
+    depends_on:
+      - rabbitmq
+    networks:
+      - weather-network
+
+  flower-consumer:
+    build:
+      dockerfile: consumer/Dockerfile.flower
+    ports:
+      - "5555:5555"
+    environment:
+      RABBITMQ_URL: amqp://admin:${RABBITMQ_PASS}@rabbitmq:5672//
+    depends_on:
+      - rabbitmq
+      - celery-consumer
+    networks:
+      - weather-network
+
 volumes:
   prometheus_data:
   grafana_data:
+  rabbitmq_data:
 
 networks:
   weather-network:
