@@ -3,6 +3,10 @@ from fastapi import FastAPI
 from fastapi.responses import Response
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 import requests
+import bindl.logger
+
+
+LOG = bindl.logger.setup_logger(__name__)
 
 
 app_metrics = FastAPI()
@@ -24,9 +28,10 @@ def observe(metric_data: dict):
 
 def post_metrics(metrics_data):
     try:
+        LOG.info(f"Posting metrics data: {metrics_data}")
         requests.post("http://metrics-exporter:8082/observe", json=metrics_data)
     except Exception as e:
-        print.error(f"Failed to send metric: {e}")
+        LOG.error(f"Failed to send metric: {e}")
 
 
 @app_metrics.get("/metrics")
