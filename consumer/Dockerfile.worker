@@ -17,5 +17,5 @@ RUN uv sync --locked
 # Environment variable for Celery
 ENV CELERY_APP=consumer.celery_consumer:app
 
-# Default command (Celery worker)
-CMD ["uv", "run", "celery", "-A", "consumer.celery_consumer:app", "worker", "--loglevel=DEBUG"]
+# The queue should be aligned with the one defined in the Celery app
+CMD ["uv", "run", "celery", "-A", "consumer.celery_consumer:app", "worker", "-Q", "redis_cache_queue", "--loglevel=DEBUG", "--concurrency=5"]

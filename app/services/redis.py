@@ -3,19 +3,17 @@
 import bindl.redis_wrapper.connection.redis_connection as rc
 import bindl.redis_wrapper.redis_handler as rh
 import bindl.logger
-from consumer.celery_consumer import process_message
+from consumer.celery_consumer import (
+    process_message,
+    RABBITMQ_REDIS_CACHE_QUEUE,
+    RABBITMQ_REDIS_CACHE_ROUTING_KEY,
+)
 import json
 
 
 LOG = bindl.logger.setup_logger(__name__)
-EXPIRATION_TIME = 1800  # 30 minutes
 
-# This should match the exchange name used in the RabbitMQ setup
-RABBITMQ_EXCHANGE = "weather_service_exchange"
-# This should match the host name used in the docker-compose file
-RABBITMQ_HOST = "rabbitmq"
-RABBITMQ_ROUTING_KEY = "mongodb_queue"
-RABBITMQ_QUEUE = "weather_service_queue"
+EXPIRATION_TIME = 1800  # 30 minutes
 
 
 class RedisConnectionError(Exception):
@@ -83,6 +81,12 @@ def save_info_redis(cache_key: str, result: dict) -> None:
     message = dict(cache_key=cache_key, payload=result, expire=EXPIRATION_TIME)
     LOG.debug("Publishing message to RabbitMQ... %s", message)
     try:
-        process_message.delay(message)
-    except Exception as e:
-        LOG.error("Error publishing message to RabbitMQ: %s", e)
+        process_message.apply_async(
+            args=[message],
+            queue=RABBITMQ_REDIS_CACHE_QUEUE,
+            routing_key=RABBITMQ_REDIS_CACHE_ROUTING_KEY,
+        )
+    except Exception as ex:
+        raise RuntimeError(f"Failed to publish message to RabbitMQ: {ex}") from ex
+
+    LOG.info("Message processed, sending ACK")
