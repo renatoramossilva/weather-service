@@ -69,11 +69,12 @@ jobs:
       version: alpha-${{ github.event.issue.number }}
       dockerfile: docker/Dockerfile
       repo_name: ramossrenato/weather_api
+      pr_number: ${{ github.event.issue.number }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  build-metrics_exporter:
+  build-metrics-exporter:
     needs: detect-changes
     if: needs.detect-changes.outputs.metrics_exporter == 'true'
     uses: ./.github/workflows/build-metrics-export.yaml
@@ -81,6 +82,22 @@ jobs:
       version: alpha-${{ github.event.issue.number }}
       dockerfile: exporter/Dockerfile
       repo_name: ramossrenato/metrics_exporter
+      pr_number: ${{ github.event.issue.number }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  post-manager:
+    needs: [build-api, build-metrics-exporter]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post no changes comment
+        if: needs.detect-changes.outputs.api == 'false' || needs.detect-changes.outputs.metrics_exporter == 'false'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ⚠️ No changes detected in Docker-related files.
+            No images were built or pushed.
+
