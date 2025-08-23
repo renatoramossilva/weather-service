@@ -19,7 +19,7 @@ on:
         required: true
 
 jobs:
-  build-consumer:
+  build-metrics-exporter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
