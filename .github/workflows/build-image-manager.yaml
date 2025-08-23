@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       api: ${{ steps.filter.outputs.api }}
-      worker: ${{ steps.filter.outputs.metrics_exporter }}
+      metrics_exporter: ${{ steps.filter.outputs.metrics_exporter }}
 
     steps:
       - name: Debug event
@@ -73,7 +73,7 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  build-worker:
+  build-metrics_exporter:
     needs: detect-changes
     if: needs.detect-changes.outputs.metrics_exporter == 'true'
     uses: ./.github/workflows/build-metrics-export.yaml
