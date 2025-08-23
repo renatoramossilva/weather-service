@@ -33,25 +33,22 @@ jobs:
           fetch-depth: 0
 
       - name: Fetch master branch
-        run: git fetch origin master --depth=1
+        run: git fetch origin master:refs/remotes/origin/master --depth=1
 
       - name: Create local master branch
-        run: git checkout -b master origin/master
+        run: git branch master origin/master
 
       - name: List all refs
         run: git show-ref
 
       - name: Show diff with master
-        run: git diff --name-only origin/master...
-
-      - name: Show diff with master II
         run: git diff --name-only master...
 
       - id: filter
         uses: dorny/paths-filter@v3
         with:
+          base: master
           initial-fetch-depth: 0
-          base: origin/master
           filters: |
             api:
               - 'docker/Dockerfile'
