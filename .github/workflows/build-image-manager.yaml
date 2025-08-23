@@ -80,7 +80,7 @@ jobs:
     with:
       version: alpha-${{ github.event.issue.number }}
       dockerfile: exporter/Dockerfile
-      repo_name: ramossrenato/weather_api
+      repo_name: ramossrenato/metrics_exporter
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
