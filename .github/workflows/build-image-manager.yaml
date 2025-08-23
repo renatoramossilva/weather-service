@@ -1,20 +1,18 @@
-name: Orchestrator
+name: Build/push Orchestrator
 
 on:
   issue_comment:
     types: [created]
 
-# Permission to read PR/contents.
 permissions:
   contents: read
   pull-requests: read
 
 jobs:
   detect-changes:
-    if: >
-       github.event_name == 'issue_comment' &&
-       github.event.issue.pull_request != null &&
-       github.event.comment.body == 'alpha-release'
+    if: |
+      github.event.issue.pull_request != null &&
+      github.event.comment.body == 'alpha-release'
     runs-on: ubuntu-latest
     outputs:
       api: ${{ steps.filter.outputs.api }}
@@ -24,22 +22,19 @@ jobs:
       - name: Debug event
         run: |
           echo "event_name=${{ github.event_name }}"
-          echo "is_pr=$([[ "${{ github.event.issue.pull_request != null }}" == "true" ]] && echo yes || echo no)"
-          echo "comment='${{ github.event.comment.body || '' }}'"
-          echo "pr_number=${{ github.event.issue.number || '' }}"
+          echo "is_pr=${{ github.event.issue.pull_request != null }}"
+          echo "comment=${{ github.event.comment.body }}"
+          echo "pr_number=${{ github.event.issue.number }}"
 
-      - name: Checkout PR head (issue_comment)
-        if: github.event_name == 'issue_comment'
+      - name: Checkout PR head
         uses: actions/checkout@v4
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
 
-      - name: Checkout pushed ref (push)
-        if: github.event_name == 'push'
-        uses: actions/checkout@v4
       - id: filter
         uses: dorny/paths-filter@v3
         with:
+          base: origin/master
           filters: |
             api:
               - 'docker/Dockerfile'
@@ -47,12 +42,17 @@ jobs:
             metrics_exporter:
               - 'exporter/**'
 
+      - name: Debug filters
+        run: |
+          echo "api=${{ steps.filter.outputs.api }}"
+          echo "metrics_exporter=${{ steps.filter.outputs.metrics_exporter }}"
+
   build-api:
     needs: detect-changes
     if: needs.detect-changes.outputs.api == 'true'
     uses: ./.github/workflows/build-api.yaml
     with:
-      sha: ${{ github.event_name == 'issue_comment' && github.event.issue.number && format('pr-{0}', github.event.issue.number) || github.sha }}
+      sha: alpha-${{ github.event.issue.number }}
       dockerfile: docker/Dockerfile
 
   build-worker:
@@ -60,5 +60,5 @@ jobs:
     if: needs.detect-changes.outputs.metrics_exporter == 'true'
     uses: ./.github/workflows/build-metrics-export.yaml
     with:
-      sha: ${{ github.event_name == 'issue_comment' && github.event.issue.number && format('pr-{0}', github.event.issue.number) || github.sha }}
+      sha: alpha-${{ github.event.issue.number }}
       dockerfile: exporter/Dockerfile
