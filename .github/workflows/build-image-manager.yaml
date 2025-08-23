@@ -35,6 +35,9 @@ jobs:
       - name: Fetch master branch
         run: git fetch origin master:refs/remotes/origin/master --depth=1
 
+      - name: Show changed files
+        run: git diff --name-only origin/master...
+
       - id: filter
         uses: dorny/paths-filter@v3
         with:
