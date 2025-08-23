@@ -31,13 +31,21 @@ jobs:
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 0
-          fetch-tags: true
+
+      - name: Fetch master branch
+        run: git fetch origin master --depth=1
+
+      - name: Create local master branch
+        run: git checkout -b master origin/master
 
       - name: List all refs
         run: git show-ref
 
       - name: Show diff with master
         run: git diff --name-only origin/master...
+
+      - name: Show diff with master II
+        run: git diff --name-only master...
 
       - id: filter
         uses: dorny/paths-filter@v3
