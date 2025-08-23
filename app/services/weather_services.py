@@ -99,3 +99,4 @@ async def get_temperature(client: httpx.AsyncClient, city: str):
 
     except httpx.RequestError as exc:
         raise HTTPException(status_code=503, detail=f"Network error: {exc}") from exc
+
