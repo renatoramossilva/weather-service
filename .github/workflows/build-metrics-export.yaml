@@ -3,10 +3,13 @@ name: Build Metrics Export Image
 on:
   workflow_call:
     inputs:
-      sha:
+      version:
         required: true
         type: string
       dockerfile:
+        required: true
+        type: string
+      repo_name:
         required: true
         type: string
     secrets:
@@ -33,4 +36,4 @@ jobs:
           file: ${{ inputs.dockerfile }}
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/metrics-exporter:dev-${{ inputs.sha }}
+            ${{ inputs.repo_name }}:metrics_dev-${{ inputs.version }}
