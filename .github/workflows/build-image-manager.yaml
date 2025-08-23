@@ -74,7 +74,7 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  build-metrics_exporter:
+  build-metrics-exporter:
     needs: detect-changes
     if: needs.detect-changes.outputs.metrics_exporter == 'true'
     uses: ./.github/workflows/build-metrics-export.yaml
@@ -88,6 +88,7 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   post-manager:
+    needs: [build-api, build-metrics-exporter]
     runs-on: ubuntu-latest
     steps:
       - name: Post no changes comment

@@ -45,11 +45,14 @@ jobs:
           tags: ${{ inputs.repo_name }}:api_dev-${{ inputs.version }}
         continue-on-error: true
 
-      - name: Post run
-        uses: ./.github/workflows/post-run.yaml
-        with:
-          pr_number: ${{ inputs.pr_number }}
-          repo_name: ${{ inputs.repo_name }}
-          version: ${{ inputs.version }}
-          hub_url: https://hub.docker.com/repository/docker/ramossrenato/weather_api
-          result: ${{ steps.docker_build.conclusion }}
+  post-run:
+    needs: build-api
+    uses: ./.github/workflows/post-run.yaml
+    with:
+      pr_number: ${{ github.event.issue.number }}
+      repo_name: ramossrenato/weather_metrics
+      version: alpha-${{ github.event.issue.number }}
+      hub_url: https://hub.docker.com/repository/docker/ramossrenato/weather_metrics
+      result: ${{ needs.build-api.result }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -15,6 +15,9 @@ on:
       result:
         required: true
         type: string
+      hub_url:
+        required: true
+        type: string
 
 jobs:
   post-comment:
