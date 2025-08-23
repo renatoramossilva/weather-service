@@ -1,0 +1,44 @@
+name: Docker Build Post Run
+
+on:
+  workflow_call:
+    inputs:
+      pr_number:
+        required: true
+        type: number
+      repo_name:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      result:
+        required: true
+        type: string
+
+jobs:
+  post-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post success comment
+        if: ${{ inputs.result == 'success' }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ inputs.pr_number }}
+          body: |
+            ✅ Docker image built and pushed successfully!
+            - Repository: `${{ inputs.repo_name }}`
+            - Tag: `api_dev-${{ inputs.version }}`
+
+            [Docker Hub URL](${{ inputs.hub_url }})
+
+      - name: Post failure comment
+        if: ${{ inputs.result == 'failure' }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ inputs.pr_number }}
+          body: |
+            ❌ Docker image build or push failed.
+            Please check the workflow logs for details.
