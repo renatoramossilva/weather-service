@@ -66,8 +66,9 @@ jobs:
     if: needs.detect-changes.outputs.api == 'true'
     uses: ./.github/workflows/build-api.yaml
     with:
-      sha: alpha-${{ github.event.issue.number }}
+      version: alpha-${{ github.event.issue.number }}
       dockerfile: docker/Dockerfile
+      repo_name: ramossrenato/weather_api
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -77,8 +78,9 @@ jobs:
     if: needs.detect-changes.outputs.metrics_exporter == 'true'
     uses: ./.github/workflows/build-metrics-export.yaml
     with:
-      sha: alpha-${{ github.event.issue.number }}
+      version: alpha-${{ github.event.issue.number }}
       dockerfile: exporter/Dockerfile
+      repo_name: ramossrenato/weather_api
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

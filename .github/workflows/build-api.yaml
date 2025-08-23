@@ -3,10 +3,13 @@ name: Build API Image
 on:
   workflow_call:
     inputs:
-      sha:
+      version:
         required: true
         type: string
       dockerfile:
+        required: true
+        type: string
+      repo_name:
         required: true
         type: string
     secrets:
@@ -18,8 +21,6 @@ on:
 jobs:
   build-api:
     runs-on: ubuntu-latest
-    env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
     steps:
       - uses: actions/checkout@v4
 
@@ -36,4 +37,4 @@ jobs:
           file: ${{ inputs.dockerfile }}
           push: true
           tags: |
-            ${{ env.DOCKERHUB_USERNAME }}/weather_api:dev-${{ inputs.sha }}
+            ${{ inputs.repo_name }}:api_dev-${{ inputs.version }}
