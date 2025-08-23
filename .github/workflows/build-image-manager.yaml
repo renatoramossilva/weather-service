@@ -31,13 +31,18 @@ jobs:
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 0
+          fetch-tags: true
 
-      - name: Fetch master branch
-        run: git fetch origin master:refs/remotes/origin/master --depth=1
+      - name: List all refs
+        run: git show-ref
+
+      - name: Show diff with master
+        run: git diff --name-only origin/master...
 
       - id: filter
         uses: dorny/paths-filter@v3
         with:
+          initial-fetch-depth: 0
           base: origin/master
           filters: |
             api:
