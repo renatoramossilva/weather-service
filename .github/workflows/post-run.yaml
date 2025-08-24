@@ -27,7 +27,7 @@ jobs:
         if: ${{ inputs.result == 'success' }}
         uses: peter-evans/create-or-update-comment@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CI_TOKEN }}
           issue-number: ${{ inputs.pr_number }}
           body: |
             ✅ Docker image built and pushed successfully!
@@ -40,7 +40,7 @@ jobs:
         if: ${{ inputs.result == 'failure' }}
         uses: peter-evans/create-or-update-comment@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CI_TOKEN }}
           issue-number: ${{ inputs.pr_number }}
           body: |
             ❌ Docker image build or push failed.

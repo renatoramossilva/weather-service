@@ -66,9 +66,9 @@ jobs:
     if: needs.detect-changes.outputs.api == 'true'
     uses: ./.github/workflows/build-api.yaml
     with:
-      version: alpha-${{ github.event.issue.number }}
+      version: api-alpha-${{ github.event.issue.number }}
       dockerfile: docker/Dockerfile
-      repo_name: ramossrenato/weather_api
+      repo_name: ramossrenato/weather_api_alpha_release
       pr_number: ${{ github.event.issue.number }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -79,9 +79,9 @@ jobs:
     if: needs.detect-changes.outputs.metrics_exporter == 'true'
     uses: ./.github/workflows/build-metrics-export.yaml
     with:
-      version: alpha-${{ github.event.issue.number }}
+      version: metrics-alpha-${{ github.event.issue.number }}
       dockerfile: exporter/Dockerfile
-      repo_name: ramossrenato/metrics_exporter
+      repo_name: ramossrenato/weather_api_alpha_release
       pr_number: ${{ github.event.issue.number }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -95,9 +95,8 @@ jobs:
         if: needs.detect-changes.outputs.api == 'false' || needs.detect-changes.outputs.metrics_exporter == 'false'
         uses: peter-evans/create-or-update-comment@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CI_TOKEN }}
           issue-number: ${{ github.event.issue.number }}
           body: |
             ⚠️ No changes detected in Docker-related files.
             No images were built or pushed.
-
