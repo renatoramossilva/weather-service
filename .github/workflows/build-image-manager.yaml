@@ -33,13 +33,10 @@ jobs:
           fetch-depth: 0
 
       - name: Fetch develop branch
-        run: git fetch origin develop:refs/remotes/origin/develop
+        run: git fetch origin develop:refs/remotes/origin/develop --depth=1
 
-      - name: Create local branch on develop
-        run: git checkout -B pr-on-develop origin/develop
-
-      - name: Merge PR head temporarily
-        run: git merge --no-commit --no-ff FETCH_HEAD || true
+      - name: Create local develop branch
+        run: git branch develop origin/develop
 
       - name: List all refs
         run: git show-ref
