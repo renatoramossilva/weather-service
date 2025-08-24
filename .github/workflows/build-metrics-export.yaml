@@ -52,5 +52,5 @@ jobs:
       pr_number: ${{ inputs.pr_number }}
       repo_name: ${{ inputs.repo_name }}
       version: metrics-alpha-${{ inputs.version }}
-      hub_url: https://hub.docker.com/r/${{ inputs.repo_name }}
+      hub_url: https://hub.docker.com/r/${{ inputs.repo_name }}/tags?name=${{ inputs.version }}
       result: ${{ needs.build-metrics-exporter.result }}

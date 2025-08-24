@@ -89,6 +89,7 @@ jobs:
 
   post-manager:
     needs: [build-api, build-metrics-exporter]
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Post no changes comment
