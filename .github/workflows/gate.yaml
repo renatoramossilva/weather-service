@@ -1,4 +1,4 @@
-name: Safe Merge on Label
+name: gate
 
 on:
   pull_request:
