@@ -54,5 +54,3 @@ jobs:
       version: ${{ inputs.version }}
       hub_url: https://hub.docker.com/r/${{ inputs.repo_name }}
       result: ${{ needs.build-api.result }}
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
