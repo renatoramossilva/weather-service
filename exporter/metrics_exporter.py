@@ -37,3 +37,4 @@ def post_metrics(metrics_data):
 @app_metrics.get("/metrics")
 def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
