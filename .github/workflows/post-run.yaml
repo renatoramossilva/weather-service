@@ -38,7 +38,8 @@ jobs:
             - Repository: `${{ inputs.repo_name }}`
             - Tag: `${{ inputs.version }}`
 
-            [Docker Hub URL](${{ inputs.hub_url }})
+            [View on Docker Hub](${{ inputs.hub_url }})
+
 
       - name: Post failure comment
         if: ${{ inputs.result == 'failure' }}
