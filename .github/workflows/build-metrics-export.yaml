@@ -42,7 +42,7 @@ jobs:
           context: .
           file: ${{ inputs.dockerfile }}
           push: true
-          tags: ${{ inputs.repo_name }}:metrics_dev-${{ inputs.version }}
+          tags: ${{ inputs.repo_name }}:${{ inputs.version }}
         continue-on-error: true
 
   post-run:
@@ -50,9 +50,9 @@ jobs:
     uses: ./.github/workflows/post-run.yaml
     with:
       pr_number: ${{ github.event.issue.number }}
-      repo_name: ramossrenato/weather_metrics
-      version: alpha-${{ github.event.issue.number }}
-      hub_url: https://hub.docker.com/repository/docker/ramossrenato/weather_metrics
+      repo_name: ${{ inputs.repo_name }}
+      version: metrics-alpha-${{ github.event.issue.number }}
+      hub_url: https://hub.docker.com/repository/docker/${{ inputs.repo_name }}
       result: ${{ needs.build-metrics-exporter.result }}
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CI_TOKEN: ${{ secrets.CI_TOKEN }}
