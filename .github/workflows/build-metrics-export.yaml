@@ -20,8 +20,6 @@ on:
         required: true
       DOCKERHUB_TOKEN:
         required: true
-      GITHUB_TOKEN:
-        required: true
 
 jobs:
   build-metrics-exporter:
@@ -58,6 +56,3 @@ jobs:
       result: ${{ needs.build-metrics-exporter.result }}
     secrets:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    permissions:
-      contents: read
-      pull-requests: write
