@@ -3,7 +3,8 @@ name: Python Linters Action
 on:
   pull_request:
     branches:
-      - develop
+      - master
+
 jobs:
   check:
     runs-on: ubuntu-latest

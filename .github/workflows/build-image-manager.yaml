@@ -68,7 +68,7 @@ jobs:
     with:
       version: api-alpha-${{ github.event.issue.number }}
       dockerfile: docker/Dockerfile
-      repo_name: ramossrenato/dev_weather_api_alpha_release
+      repo_name: ramossrenato/weather_api_alpha_release
       pr_number: ${{ github.event.issue.number }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -81,7 +81,7 @@ jobs:
     with:
       version: metrics-alpha-${{ github.event.issue.number }}
       dockerfile: exporter/Dockerfile
-      repo_name: ramossrenato/dev_weather_api_alpha_release
+      repo_name: ramossrenato/weather_api_alpha_release
       pr_number: ${{ github.event.issue.number }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
