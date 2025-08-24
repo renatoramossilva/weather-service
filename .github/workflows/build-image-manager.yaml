@@ -32,22 +32,22 @@ jobs:
           ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 0
 
-      - name: Fetch master branch
-        run: git fetch origin master:refs/remotes/origin/master --depth=1
+      - name: Fetch develop branch
+        run: git fetch origin develop:refs/remotes/origin/develop --depth=1
 
-      - name: Create local master branch
-        run: git branch master origin/master
+      - name: Create local develop branch
+        run: git branch develop origin/develop
 
       - name: List all refs
         run: git show-ref
 
-      - name: Show diff with master
-        run: git diff --name-only master...
+      - name: Show diff with develop
+        run: git diff --name-only develop...
 
       - id: filter
         uses: dorny/paths-filter@v3
         with:
-          base: master
+          base: develop
           initial-fetch-depth: 0
           filters: |
             api:
