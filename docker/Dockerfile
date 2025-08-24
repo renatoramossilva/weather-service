@@ -17,6 +17,7 @@ RUN uv sync --locked
 # Expose port 8000
 # This config should matches with the ports config on
 # docker compose file
+
 EXPOSE 8000
 
 # Run app
